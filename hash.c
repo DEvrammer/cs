@@ -1,87 +1,85 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#define TABLE_SIZE 10
-
-int hash(int key) {
-    return key % TABLE_SIZE;
+#include<stdio.h>
+#define MAX 10
+int hashfunction(int key,int i)
+{
+    return ((key%MAX)+i)%MAX;
 }
-
-void insert(int table[], int key) {
-    int index = hash(key);
-    if (table[index] == 0) { 
-        table[index] = key;
-    } else { 
-        int i = (index + 1) % TABLE_SIZE;
-        while (i != index && table[i] != 0) {
-            i = (i + 1) % TABLE_SIZE;
-        }
-        if (i == index) {
-            printf("Hash table is full, cannot insert %d\n", key);
-        } else {
-            table[i] = key;
-        }
+void insert(int hashtable[],int key)
+{
+    int i,index;
+    for(i=0;i<MAX;i++)
+    {
+        index = hashfunction(key,i);
+        if(hashtable[index]==-1)
+            {
+                hashtable[index] = key;
+                return;
+            }    
     }
+    printf("\n%d can't be inserted",key);
 }
-
-void delete(int table[], int key) {
-    int index = hash(key);
-    if (table[index] == key) { 
-        table[index] = 0;
-    } else { 
-        int i = (index + 1) % TABLE_SIZE;
-        while (i != index && table[i] != key) {
-            i = (i + 1) % TABLE_SIZE;
-        }
-        if (i == index) {
-            printf("Key %d not found in hash table\n", key);
-        } else {
-            table[i] = 0;
-        }
+int search(int hashtable[],int key)
+{
+    int i,index;
+    for(i=0;i<MAX;i++)
+    {
+        index = hashfunction(key,i);
+        if(hashtable[index] == key)
+            return index;
     }
+    return -1;
 }
-
-void display(int table[]) {
-    printf("Hash table:\n");
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        printf("%d: %d\n", i, table[i]);
-    }
+void delete(int hashtable[],int key)
+{
+    int index;
+    index = search(hashtable,key);
+    if(index==-1)
+        printf("%d is not found",key);
+    else
+        hashtable[index]=-1;    
 }
-
-int main() {
-    int table[TABLE_SIZE] = {0};
-    int choice, key;
-
-    do {
-        printf("\nMenu:\n");
-        printf("1. Insert a key\n");
-        printf("2. Delete a key\n");
-        printf("3. Display the hash table\n");
-        printf("4. Exit\n");
-        printf("Enter your choice (1-4): ");
-        scanf("%d", &choice);
-
-        switch (choice) {
-            case 1:
-                printf("Enter the key to be inserted: ");
-                scanf("%d", &key);
-                insert(table, key);
-                break;
-            case 2:
-                printf("Enter the key to be deleted: ");
-                scanf("%d", &key);
-                delete(table, key);
-                break;
-            case 3:
-                display(table);
-                break;
-            case 4:
-                printf("Exiting...\n");
-                break;
-            default:
-                printf("Invalid choice\n");
+void showtable(int hashtable[])
+{
+    int i;
+    for(i=0;i<MAX;i++)
+        printf("%d[%d]\n",i,hashtable[i]);
+}
+void init(int hashtable[])
+{
+    int i;
+    for(i=0;i<MAX;i++)
+        hashtable[i]=-1;
+}
+int main()
+{
+    int hashtable[MAX],ch,key,index;
+    init(hashtable);
+    do{
+        printf("1:Insert\n2:Search\n3:Delete\n4:Exit\n");
+        printf("\nEnter your choice:");
+        scanf("%d",&ch);
+        switch(ch)
+        {
+            case 1: printf("\nEnter key to be inserted:");
+                    scanf("%d",&key);
+                    insert(hashtable,key);
+                    showtable(hashtable);
+                    break;
+            case 2: printf("\nEnter key to be searched:");
+                    scanf("%d",&key);
+                    index = search(hashtable,key);
+                    if(index==-1)
+                        printf("key not found");
+                    else
+                        printf("key is found at %d location",index);
+                    break;
+            case 3: printf("\nEnter key to be deleted:");
+                    scanf("%d",&key);
+                    delete(hashtable,key);
+                    showtable(hashtable);
+                    break;                    
         }
-    } while (choice != 4);
+    }while(ch!=4);
 
     return 0;
 }
